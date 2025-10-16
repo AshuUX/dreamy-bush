@@ -1,0 +1,116 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Services | Study Worldwide Solution</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Study Worldwide Solution</h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html" class="active">Services</a></li>
+          <li><a href="countries.html">Countries</a></li>
+          <li><a href="tests.html">Tests</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <h2>Our Services</h2>
+      <p>Comprehensive support for every step of your study abroad journey</p>
+    </div>
+  </section>
+
+  <section class="services-page">
+    <div class="container">
+      <div class="service-grid">
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="Abroad Studies">
+          <h3>Abroad Studies</h3>
+          <p>Expert counseling and application support to help you secure admission at top international universities.</p>
+        </div>
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="Test Preparation">
+          <h3>Test Preparation</h3>
+          <p>Personalized classes and resources for IELTS, TOEFL, PTE, SAT, GMAT, and Japanese Language tests.</p>
+        </div>
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="Scholarship Guidance">
+          <h3>Scholarship Guidance</h3>
+          <p>We help students identify and apply for scholarships to reduce the financial burden of studying abroad.</p>
+        </div>
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="Pre-Departure Sessions">
+          <h3>Pre-Departure Sessions</h3>
+          <p>Orientation sessions that prepare students for life in their destination country — from culture to safety tips.</p>
+        </div>
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="University Presentations">
+          <h3>University Presentations</h3>
+          <p>Regular university and college presentations to connect students directly with admissions representatives.</p>
+        </div>
+        <div class="service-card">
+          <img src="https://via.placeholder.com/300x200" alt="Library & Resources">
+          <h3>Library & Resources</h3>
+          <p>Access to study materials, guides, and sample test papers in our in-house student library.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Study Worldwide Solution. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
